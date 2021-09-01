@@ -1,0 +1,13 @@
+{
+    "groups": [
+        {
+            "title": "Tutorials",
+            "pages": [
+                {
+                    "title": "Test",
+                    "source": "./tutorials/Test.md"
+                }
+            ]
+        }
+    ]
+}
