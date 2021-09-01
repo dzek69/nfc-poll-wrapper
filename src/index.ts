@@ -116,4 +116,5 @@ export {
 
 export type {
     DeviceInfo,
+    NFCPoll,
 };

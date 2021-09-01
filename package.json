@@ -1,6 +1,6 @@
 {
   "name": "nfc-poll-wrapper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": "git@github.com:dzek69/nfc-poll-wrapper.git",
   "author": "Jacek Nowacki",
   "license": "MIT",
@@ -63,5 +63,13 @@
     "language": "typescript",
     "fixDefaultForCommonJS": true,
     "jsx": false
-  }
+  },
+  "keywords": [
+    "nfc",
+    "nfc-poll",
+    "libnfc",
+    "PN532",
+    "raspberry",
+    "rpi"
+  ]
 }
