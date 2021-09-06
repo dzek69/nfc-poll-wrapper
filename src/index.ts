@@ -1,5 +1,4 @@
-// node-pty is used, because `nfc-poll` buffers the output when there is no tty until the program ends
-import { spawn } from "node-pty";
+import { spawn } from "child_process";
 import EventEmitter from "eventemitter3";
 
 import type { NFCData } from "./extractNfcData";
@@ -8,6 +7,7 @@ import { extractNfcData } from "./extractNfcData.js";
 enum State {
     IDLE = "IDLE",
     STARTING = "STARTING",
+    STARTED = "STARTED",
     POLLING = "POLLING",
     WAITING_FOR_RELEASE = "WAITING_FOR_RELEASE",
     DONE = "DONE",
@@ -38,20 +38,28 @@ class NFCPoll extends EventEmitter {
         this._opts = opts;
 
         this._state = State.IDLE;
-        this._spawn();
+        setTimeout(() => {
+            this._spawn();
+        }); // allow events to be attached before first spawn
     }
 
     private _spawn() {
-        this._process = spawn(this._opts.command, this._opts.args, {});
+        this._process = spawn("stdbuf", ["-o0", "-e0", this._opts.command, ...this._opts.args], {});
         this._collectedResponse = "";
         this.state = State.STARTING;
 
         // @TODO test if stdout is available, if not, complain early?
 
+        // @TODO after "Waiting(...)..." there is stderr output:
+        // nfc_initiator_target_is_present: Target Released
+        // or
+        // nfc_initiator_target_is_present: RF Transmission Error
+        // maybe something more? - handle it
+
         // eslint-disable-next-line max-statements
-        this._process.on("data", (data) => {
+        this._process.stdout?.on("data", (data) => {
             this._collectedResponse += String(data);
-            if (this.state === State.STARTING) {
+            if (this.state === State.STARTING || this.state === State.STARTED) {
                 if (WILL_POLL.exec(this._collectedResponse)) {
                     this.state = State.POLLING;
                 }
@@ -81,7 +89,11 @@ class NFCPoll extends EventEmitter {
             }
         });
 
-        this._process.on("exit", (code) => {
+        this._process.on("spawn", () => {
+            this.state = State.STARTED;
+        });
+
+        this._process.on("close", (code) => {
             this.state = State.IDLE;
             this.emit("process-exit", code);
             const timeout = code ? ERROR_SPAWN_TIMEOUT : SUCCESS_SPAWN_TIMEOUT;

@@ -1,6 +1,6 @@
 {
   "name": "nfc-poll-wrapper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "repository": "git@github.com:dzek69/nfc-poll-wrapper.git",
   "author": "Jacek Nowacki",
   "license": "MIT",
@@ -29,8 +29,7 @@
   "module": "./esm/index.js",
   "type": "module",
   "dependencies": {
-    "eventemitter3": "^4.0.7",
-    "node-pty": "^0.10.1"
+    "eventemitter3": "^4.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",

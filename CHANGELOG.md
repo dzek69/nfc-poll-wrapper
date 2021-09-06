@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 (nothing yet)
 
+## [1.0.2] - 2021-09-06
+### Fixed
+- Poll hanging after few hours
+- Not being able to catch first "STARTING" event
+### Added
+- "STARTED" event
+
 ## [1.0.1] - 2021-09-01
 ### Added
 - type export to prevent some TS issues
