@@ -1,17 +1,11 @@
 import { spawn } from "child_process";
 import EventEmitter from "eventemitter3";
+import type TypedEmitter from "typed-emitter";
 
 import type { NFCData } from "./extractNfcData";
+import type { EEvents } from "./types";
+import { State } from "./types.js";
 import { extractNfcData } from "./extractNfcData.js";
-
-enum State {
-    IDLE = "IDLE",
-    STARTING = "STARTING",
-    STARTED = "STARTED",
-    POLLING = "POLLING",
-    WAITING_FOR_RELEASE = "WAITING_FOR_RELEASE",
-    DONE = "DONE",
-}
 
 interface DeviceInfo extends NFCData {
     raw: string;
@@ -23,7 +17,7 @@ const SUCCESS_SPAWN_TIMEOUT = 0;
 const WILL_POLL = /will poll during \d+ ms \(\d+ pollings of \d+ ms for \d+ modulations\)/;
 const WAITING = "Waiting for card removing...";
 
-class NFCPoll extends EventEmitter {
+class NFCPoll extends (EventEmitter as unknown as new () => TypedEmitter<EEvents>) {
     private _state: State;
 
     private _process?: ReturnType<typeof spawn>;
@@ -33,8 +27,8 @@ class NFCPoll extends EventEmitter {
     private readonly _opts: { command: string; args: string[] };
 
     public constructor(opts: { command: string; args: string[]}) {
+        // eslint-disable-next-line constructor-super
         super();
-
         this._opts = opts;
 
         this._state = State.IDLE;
@@ -44,7 +38,7 @@ class NFCPoll extends EventEmitter {
     }
 
     private _spawn() {
-        this._process = spawn("stdbuf", ["-o0", "-e0", this._opts.command, ...this._opts.args], {});
+        this._process = spawn("stdbduf", ["-o0", "-e0", this._opts.command, ...this._opts.args], {});
         this._collectedResponse = "";
         this.state = State.STARTING;
 
@@ -99,6 +93,10 @@ class NFCPoll extends EventEmitter {
             const timeout = code ? ERROR_SPAWN_TIMEOUT : SUCCESS_SPAWN_TIMEOUT;
             setTimeout(() => { this._spawn(); }, timeout);
         });
+
+        this._process.on("error", (e: Error) => {
+            this.emit("process-error", e);
+        });
     }
 
     public get state() {
@@ -124,6 +122,7 @@ const poll = (command = "nfc-poll", args = ["-v"]) => {
 
 export {
     poll,
+    State,
 };
 
 export type {

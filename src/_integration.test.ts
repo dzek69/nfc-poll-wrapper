@@ -8,6 +8,9 @@ const instance = mock
     ? poll("node", ["./test/nfc-poll.mock.js"])
     : poll();
 
+instance.on("process-error", () => {
+    console.info("stdbuf not installed");
+});
 instance.on("process-exit", (code) => {
     console.info("nfc-poll exited", code);
 });

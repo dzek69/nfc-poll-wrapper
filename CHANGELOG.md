@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 (nothing yet)
 
+## [1.1.0] - 2022-04-15
+### Fixed
+- crashing when `stdbuf` is not available
+### Added
+- `process-error` event
+### Dev
+- events emitter is now typed
+- deps bumped
+
 ## [1.0.2] - 2021-09-06
 ### Fixed
 - Poll hanging after few hours
