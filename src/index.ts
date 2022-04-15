@@ -38,7 +38,7 @@ class NFCPoll extends (EventEmitter as unknown as new () => TypedEmitter<EEvents
     }
 
     private _spawn() {
-        this._process = spawn("stdbduf", ["-o0", "-e0", this._opts.command, ...this._opts.args], {});
+        this._process = spawn("stdbuf", ["-o0", "-e0", this._opts.command, ...this._opts.args], {});
         this._collectedResponse = "";
         this.state = State.STARTING;
 
